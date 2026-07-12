@@ -1,0 +1,660 @@
+{
+  "schemaVersion": 2,
+  "repo": "razorpay/blade",
+  "nodes": {
+    "component:razorpay/blade:dropdown": {
+      "id": "component:razorpay/blade:dropdown",
+      "type": "component",
+      "label": "Dropdown",
+      "data": { "name": "Dropdown" },
+      "confidence": null,
+      "provenance": { "source": "github", "origin": "prefetch" },
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z",
+      "version": 1
+    },
+    "component:razorpay/blade:alert": {
+      "id": "component:razorpay/blade:alert",
+      "type": "component",
+      "label": "Alert",
+      "data": { "name": "Alert" },
+      "confidence": null,
+      "provenance": { "source": "github", "origin": "prefetch" },
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-01-15T00:00:00.000Z",
+      "version": 1
+    },
+    "decision:razorpay/blade:dropdown:controlled-only-api": {
+      "id": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "type": "decision",
+      "label": "Dropdown uses controlled-only API",
+      "data": {
+        "id": "decision:razorpay/blade:dropdown:controlled-only-api",
+        "title": "Dropdown uses controlled-only API",
+        "scope": { "component": "Dropdown" },
+        "status": "superseded",
+        "hypothesis": "A controlled-only API avoids SSR hydration mismatches because the component never renders DOM until client-side JavaScript initializes and takes ownership of the state.",
+        "context": "Dropdown was initially implemented as an uncontrolled component. SSR hydration bugs caused the dropdown to flash open on page load and mismatched selected values between server and client renders.",
+        "alternatives": [
+          {
+            "option": "Native select element",
+            "reasonRejected": "Native select cannot be styled consistently across platforms. Blade targets both web and React Native, and native select rendering differs significantly across browsers and platforms.",
+            "evidenceIds": ["pull_request:razorpay/blade#1423"]
+          },
+          {
+            "option": "Uncontrolled + ref-based hydration detection",
+            "reasonRejected": "Complex state management required to detect hydration and suppress flash. Multiple React 17 issues with ref-based hydration detection reported in the community.",
+            "evidenceIds": ["issue:razorpay/blade#89"]
+          },
+          {
+            "option": "Hybrid controlled/uncontrolled with auto-detection",
+            "reasonRejected": "Increased API surface and testing complexity. The team decided a single pattern was more maintainable than supporting both modes.",
+            "evidenceIds": ["pull_request:razorpay/blade#1423"]
+          }
+        ],
+        "chosenSolution": "Dropdownexposes a controlled-only API where the parent component manages selection state via `value` and `onChange` props. The component never maintains internal state for the selected value.",
+        "tradeOffs": [
+          "Consumers must always manage selection state — no 'drop-in' usage for simple cases",
+          "Re-render performance depends on parent's state management, not the component's internal optimization",
+          "Clearer mental model: the component is always a controlled input, never a hybrid",
+          "Easier to test: all behavior is driven by props, no internal state branches"
+        ],
+        "evidence": [
+          {
+            "id": "pull_request:razorpay/blade#1423",
+            "kind": "pr",
+            "url": "https://github.com/razorpay/blade/pull/1423",
+            "title": "feat(Dropdown): controlled-only API",
+            "excerpt": "We chose controlled because uncontrolled causes hydration mismatches in SSR. The flash of incorrect state on page load is unacceptable for a primary navigation component.",
+            "date": "2022-06-15"
+          },
+          {
+            "id": "issue:razorpay/blade#89",
+            "kind": "issue",
+            "url": "https://github.com/razorpay/blade/issues/89",
+            "title": "SSR hydration mismatch in Dropdown component",
+            "excerpt": "Dropdown flashes open on every page load because the server renders with default state and client hydrates with a different state. This is a known React 17 pattern but we should fix it at the component level.",
+            "date": "2022-03-22"
+          }
+        ],
+        "expectedOutcome": "Eliminate SSR hydration mismatches across all Dropdown instances in Blade.",
+        "observedOutcome": "Hydration mismatches were eliminated. Some teams reported increased boilerplate for simple selectors, but the trade-off was accepted as documented.",
+        "confidence": "high",
+        "confidenceRationale": "The decision is explicitly stated in PR #1423 with clear reasoning. The supporting issue #89 documents the concrete problem. Both evidence items have verbatim excerpts that directly support the claim.",
+        "actors": ["rahulghadge", "chaitanyadeorukhkar"],
+        "decidedAt": "2022-06-15",
+        "extraction": {
+          "runId": "run_dropdown_extraction",
+          "model": "claude-sonnet-4-5",
+          "toolCalls": 18,
+          "ts": "2024-01-15T10:30:00.000Z"
+        }
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "extraction:run_dropdown_extraction",
+        "url": "https://github.com/razorpay/blade"
+      },
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z",
+      "version": 1
+    },
+    "decision:razorpay/blade:dropdown:accessibility-v2": {
+      "id": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "type": "decision",
+      "label": "Dropdown accessibility API v2",
+      "data": {
+        "id": "decision:razorpay/blade:dropdown:accessibility-v2",
+        "title": "Dropdown accessibility API v2",
+        "scope": { "component": "Dropdown" },
+        "status": "adopted",
+        "hypothesis": "A separate, explicit accessibility API will make screen reader support more predictable than relying on ARIA attributes inferred from the controlled API pattern.",
+        "context": "After the controlled-only API shipped, accessibility audits revealed that screen readers were not announcing dropdown state changes reliably. The existing ARIA attribute inference was fragile and inconsistent across browsers.",
+        "alternatives": [
+          {
+            "option": "Fix ARIA inference in the existing API",
+            "reasonRejected": "The inference logic was complex and browser-specific. Maintaining per-browser ARIA quirks in the component itself was not sustainable.",
+            "evidenceIds": ["pull_request:razorpay/blade#2101"]
+          },
+          {
+            "option": "Third-party accessibility library",
+            "reasonRejected": "Added bundle size and dependency risk. The team preferred a built-in solution that could be documented and tested as part of Blade's own accessibility testing pipeline.",
+            "evidenceIds": ["pull_request:razorpay/blade#2101"]
+          }
+        ],
+        "chosenSolution": "Introduced explicit `accessibility` prop object with `label`, `description`, `role` fields. Screen reader announcements are now deterministic and testable via the component's own test suite.",
+        "tradeOffs": [
+          "Additional API surface — consumers must learn the accessibility prop pattern",
+          "More verbose usage for simple cases that worked with default ARIA",
+          "Predictable screen reader behavior across all supported browsers",
+          "Accessibility behavior is now testable in component tests, not just E2E"
+        ],
+        "evidence": [
+          {
+            "id": "pull_request:razorpay/blade#2101",
+            "kind": "pr",
+            "url": "https://github.com/razorpay/blade/pull/2101",
+            "title": "feat(Dropdown): explicit accessibility API",
+            "excerpt": "The existing ARIA inference was fragile. We need an explicit API that gives consumers control over screen reader announcements. This also lets us test accessibility behavior in unit tests.",
+            "date": "2023-01-20"
+          },
+          {
+            "id": "issue:razorpay/blade#89",
+            "kind": "issue",
+            "url": "https://github.com/razorpay/blade/issues/89",
+            "title": "SSR hydration mismatch in Dropdown component",
+            "excerpt": "Screen readers not announcing dropdown state changes after the controlled-only migration. The ARIA live region inference doesn't work consistently in Firefox.",
+            "date": "2022-11-05"
+          }
+        ],
+        "expectedOutcome": "Consistent screen reader announcements across Chrome, Firefox, and Safari.",
+        "observedOutcome": null,
+        "confidence": "medium",
+        "confidenceRationale": "The PR is explicit about the decision, but there is no follow-up issue or PR confirming the outcome. The evidence supports the motivation but not the result.",
+        "actors": ["chaitanyadeorukhkar", "saurabhdaware"],
+        "decidedAt": "2023-01-20",
+        "extraction": {
+          "runId": "run_dropdown_extraction",
+          "model": "claude-sonnet-4-5",
+          "toolCalls": 18,
+          "ts": "2024-01-15T10:30:00.000Z"
+        }
+      },
+      "confidence": "medium",
+      "provenance": {
+        "source": "github",
+        "origin": "extraction:run_dropdown_extraction",
+        "url": "https://github.com/razorpay/blade"
+      },
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z",
+      "version": 1
+    },
+    "decision:razorpay/blade:dropdown:native-select-rejected": {
+      "id": "decision:razorpay/blade:dropdown:native-select-rejected",
+      "type": "decision",
+      "label": "Native select rejected for Dropdown",
+      "data": {
+        "id": "decision:razorpay/blade:dropdown:native-select-rejected",
+        "title": "Native select rejected for Dropdown",
+        "scope": { "component": "Dropdown" },
+        "status": "adopted",
+        "hypothesis": "Using the native HTML select element would eliminate the need for a custom dropdown implementation, reducing maintenance burden and ensuring consistent behavior across platforms.",
+        "context": "During initial architecture discussions for Blade's Dropdown component, the team evaluated whether a native select element would suffice before building a custom solution.",
+        "alternatives": [],
+        "chosenSolution": "Native select was rejected. Blade targets both web and React Native. A native select would require a separate implementation per platform, defeating the purpose of a cross-platform design system component.",
+        "tradeOffs": [
+          "Cross-platform consistency required a custom solution",
+          "Native select styling limitations made it unusable for the design system's visual requirements",
+          "Custom dropdown added significant engineering investment but enabled platform-consistent behavior"
+        ],
+        "evidence": [
+          {
+            "id": "pull_request:razorpay/blade#1423",
+            "kind": "pr",
+            "url": "https://github.com/razorpay/blade/pull/1423",
+            "title": "feat(Dropdown): controlled-only API",
+            "excerpt": "We considered native select but it can't be styled consistently across platforms. Since Blade targets both web and React Native, we need a custom solution that works identically everywhere.",
+            "date": "2022-06-15"
+          },
+          {
+            "id": "issue:razorpay/blade#45",
+            "kind": "issue",
+            "url": "https://github.com/razorpay/blade/issues/45",
+            "title": "RFC: Dropdown component — platform considerations",
+            "excerpt": "Given our cross-platform requirements, a native select would need separate implementations for web and mobile. The proposal is to build a custom dropdown that renders consistently everywhere.",
+            "date": "2022-01-10"
+          }
+        ],
+        "expectedOutcome": "A custom dropdown that provides consistent behavior and appearance across all platforms.",
+        "observedOutcome": null,
+        "confidence": "high",
+        "confidenceRationale": "Both the PR and the RFC explicitly document the native select rejection with cross-platform reasoning. The evidence is strong and consistent.",
+        "actors": ["rahulghadge"],
+        "decidedAt": "2022-01-15",
+        "extraction": {
+          "runId": "run_dropdown_extraction",
+          "model": "claude-sonnet-4-5",
+          "toolCalls": 18,
+          "ts": "2024-01-15T10:30:00.000Z"
+        }
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "extraction:run_dropdown_extraction",
+        "url": "https://github.com/razorpay/blade"
+      },
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z",
+      "version": 1
+    },
+    "decision:razorpay/blade:alert:action-slots": {
+      "id": "decision:razorpay/blade:alert:action-slots",
+      "type": "decision",
+      "label": "Alert action slots instead of props",
+      "data": {
+        "id": "decision:razorpay/blade:alert:action-slots",
+        "title": "Alert action slots instead of props",
+        "scope": { "component": "Alert" },
+        "status": "superseded",
+        "hypothesis": "Using named slots for actions (primary action, secondary action, dismiss) will be more flexible than boolean props for different action combinations.",
+        "context": "Alert component needed to support multiple action patterns: single CTA, primary+secondary, dismiss only, and custom action content. Boolean props like `showDismiss` and `showPrimaryAction` were becoming unwieldy.",
+        "alternatives": [
+          {
+            "option": "Boolean prop configuration",
+            "reasonRejected": "Prop combinations grew combinatorially. Six boolean props would create 64 possible configurations, many invalid. TypeScript couldn't track valid combinations.",
+            "evidenceIds": []
+          }
+        ],
+        "chosenSolution": "Named slot pattern: `primaryAction`, `secondaryAction`, and `dismiss` slots that consumers fill with button components. Invalid combinations are impossible because slots are optional by design.",
+        "tradeOffs": [
+          "More verbose — consumers must import and render Button components",
+          "Maximum flexibility — any action pattern is supported without new props",
+          "TypeScript tracks valid states through component composition, not prop validation"
+        ],
+        "evidence": [
+          {
+            "id": "pull_request:razorpay/blade#891",
+            "kind": "pr",
+            "url": "https://github.com/razorpay/blade/pull/891",
+            "title": "feat(Alert): action slot pattern",
+            "excerpt": "Boolean props for alert actions have become unmanageable. The slot pattern lets consumers compose exactly what they need without us maintaining combinatorial prop validation.",
+            "date": "2022-09-10"
+          }
+        ],
+        "expectedOutcome": "Eliminate invalid action configurations at the type level.",
+        "observedOutcome": "Action slot pattern was successful but later superseded by a more general composition API in Alert v3.",
+        "confidence": "medium",
+        "confidenceRationale": "The PR documents the decision, but there is limited discussion evidence showing the alternatives were deeply evaluated.",
+        "actors": ["chaitanyadeorukhkar"],
+        "decidedAt": "2022-09-10",
+        "extraction": {
+          "runId": "run_alert_extraction",
+          "model": "claude-sonnet-4-5",
+          "toolCalls": 15,
+          "ts": "2024-01-15T11:00:00.000Z"
+        }
+      },
+      "confidence": "medium",
+      "provenance": {
+        "source": "github",
+        "origin": "extraction:run_alert_extraction",
+        "url": "https://github.com/razorpay/blade"
+      },
+      "createdAt": "2024-01-15T11:00:00.000Z",
+      "updatedAt": "2024-01-15T11:00:00.000Z",
+      "version": 1
+    },
+    "decision:razorpay/blade:alert:composition-api": {
+      "id": "decision:razorpay/blade:alert:composition-api",
+      "type": "decision",
+      "label": "Alert v3 composition API",
+      "data": {
+        "id": "decision:razorpay/blade:alert:composition-api",
+        "title": "Alert v3 composition API",
+        "scope": { "component": "Alert" },
+        "status": "adopted",
+        "hypothesis": "A full composition API (Alert.Root, Alert.Title, Alert.Description, Alert.Actions) will be more extensible than named slots as the component adds more features.",
+        "context": "Alert v2 with named slots worked well for actions but didn't scale to new features: custom icons, collapsible content, inline links, and toast mode. Each new feature required a new slot or prop.",
+        "alternatives": [
+          {
+            "option": "Extend slot pattern with more slots",
+            "reasonRejected": "Adding slots for every new feature would lead to the same combinatorial complexity as props. The slot pattern was an intermediate step, not the final API.",
+            "evidenceIds": []
+          }
+        ],
+        "chosenSolution": "Compound component pattern: Alert.Root (container + context), Alert.Title, Alert.Description, Alert.Actions, Alert.Icon. Each sub-component is independently configurable. Context via React context, not prop drilling.",
+        "tradeOffs": [
+          "More imports required per usage",
+          "Extremely flexible — any layout or feature combination is supported",
+          "Tree-shakeable — consumers only pay for sub-components they use",
+          "Learning curve: consumers must understand the compound component pattern"
+        ],
+        "evidence": [
+          {
+            "id": "pull_request:razorpay/blade#1567",
+            "kind": "pr",
+            "url": "https://github.com/razorpay/blade/pull/1567",
+            "title": "feat(Alert): compound component API v3",
+            "excerpt": "The slot pattern hit its limits. Compound components give us infinite extensibility without combinatorial props. Each new feature becomes a sub-component, not a prop or slot.",
+            "date": "2023-06-20"
+          }
+        ],
+        "expectedOutcome": "Alert component can be extended with new features without API breaking changes.",
+        "observedOutcome": null,
+        "confidence": "high",
+        "confidenceRationale": "The PR explicitly documents the reasoning for the architecture change, cites the slot pattern limitations, and the compound component pattern is a well-established React pattern.",
+        "actors": ["saurabhdaware", "chaitanyadeorukhkar"],
+        "decidedAt": "2023-06-20",
+        "extraction": {
+          "runId": "run_alert_extraction",
+          "model": "claude-sonnet-4-5",
+          "toolCalls": 15,
+          "ts": "2024-01-15T11:00:00.000Z"
+        }
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "extraction:run_alert_extraction",
+        "url": "https://github.com/razorpay/blade"
+      },
+      "createdAt": "2024-01-15T11:00:00.000Z",
+      "updatedAt": "2024-01-15T11:00:00.000Z",
+      "version": 1
+    },
+    "pull_request:razorpay/blade#1423": {
+      "id": "pull_request:razorpay/blade#1423",
+      "type": "pull_request",
+      "label": "feat(Dropdown): controlled-only API",
+      "data": {
+        "number": 1423,
+        "title": "feat(Dropdown): controlled-only API",
+        "url": "https://github.com/razorpay/blade/pull/1423",
+        "state": "merged",
+        "author": "rahulghadge"
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2022-06-15T10:00:00.000Z",
+      "updatedAt": "2022-06-15T10:00:00.000Z",
+      "version": 1
+    },
+    "pull_request:razorpay/blade#2101": {
+      "id": "pull_request:razorpay/blade#2101",
+      "type": "pull_request",
+      "label": "feat(Dropdown): accessibility API",
+      "data": {
+        "number": 2101,
+        "title": "feat(Dropdown): explicit accessibility API",
+        "url": "https://github.com/razorpay/blade/pull/2101",
+        "state": "merged",
+        "author": "chaitanyadeorukhkar"
+      },
+      "confidence": "medium",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2023-01-20T14:00:00.000Z",
+      "updatedAt": "2023-01-20T14:00:00.000Z",
+      "version": 1
+    },
+    "pull_request:razorpay/blade#891": {
+      "id": "pull_request:razorpay/blade#891",
+      "type": "pull_request",
+      "label": "feat(Alert): action slot pattern",
+      "data": {
+        "number": 891,
+        "title": "feat(Alert): action slot pattern",
+        "url": "https://github.com/razorpay/blade/pull/891",
+        "state": "merged",
+        "author": "chaitanyadeorukhkar"
+      },
+      "confidence": "medium",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2022-09-10T09:00:00.000Z",
+      "updatedAt": "2022-09-10T09:00:00.000Z",
+      "version": 1
+    },
+    "pull_request:razorpay/blade#1567": {
+      "id": "pull_request:razorpay/blade#1567",
+      "type": "pull_request",
+      "label": "feat(Alert): compound API v3",
+      "data": {
+        "number": 1567,
+        "title": "feat(Alert): compound component API v3",
+        "url": "https://github.com/razorpay/blade/pull/1567",
+        "state": "merged",
+        "author": "saurabhdaware"
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2023-06-20T11:00:00.000Z",
+      "updatedAt": "2023-06-20T11:00:00.000Z",
+      "version": 1
+    },
+    "issue:razorpay/blade#89": {
+      "id": "issue:razorpay/blade#89",
+      "type": "issue",
+      "label": "SSR hydration mismatch in Dropdown",
+      "data": {
+        "number": 89,
+        "title": "SSR hydration mismatch in Dropdown component",
+        "url": "https://github.com/razorpay/blade/issues/89",
+        "state": "closed",
+        "author": "rahulghadge"
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2022-03-22T08:00:00.000Z",
+      "updatedAt": "2022-03-22T08:00:00.000Z",
+      "version": 1
+    },
+    "issue:razorpay/blade#45": {
+      "id": "issue:razorpay/blade#45",
+      "type": "issue",
+      "label": "RFC: Dropdown cross-platform",
+      "data": {
+        "number": 45,
+        "title": "RFC: Dropdown component — platform considerations",
+        "url": "https://github.com/razorpay/blade/issues/45",
+        "state": "closed",
+        "author": "rahulghadge"
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2022-01-10T12:00:00.000Z",
+      "updatedAt": "2022-01-10T12:00:00.000Z",
+      "version": 1
+    },
+    "commit:razorpay/blade@a1b2c3d4e5f6": {
+      "id": "commit:razorpay/blade@a1b2c3d4e5f6",
+      "type": "commit",
+      "label": "feat: dropdown controlled API",
+      "data": {
+        "sha": "a1b2c3d4e5f6",
+        "message": "feat(Dropdown): implement controlled-only API with SSR guard",
+        "url": "https://github.com/razorpay/blade/commit/a1b2c3d4e5f6",
+        "author": "rahulghadge"
+      },
+      "confidence": "high",
+      "provenance": {
+        "source": "github",
+        "origin": "prefetch"
+      },
+      "createdAt": "2022-06-15T11:00:00.000Z",
+      "updatedAt": "2022-06-15T11:00:00.000Z",
+      "version": 1
+    }
+  },
+  "edges": {
+    "AFFECTS:decision:razorpay/blade:dropdown:controlled-only-api->component:razorpay/blade:dropdown": {
+      "id": "AFFECTS:decision:razorpay/blade:dropdown:controlled-only-api->component:razorpay/blade:dropdown",
+      "type": "AFFECTS",
+      "from": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "to": "component:razorpay/blade:dropdown",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "This decision directly shapes the Dropdown component's API surface.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "AFFECTS:decision:razorpay/blade:dropdown:accessibility-v2->component:razorpay/blade:dropdown": {
+      "id": "AFFECTS:decision:razorpay/blade:dropdown:accessibility-v2->component:razorpay/blade:dropdown",
+      "type": "AFFECTS",
+      "from": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "to": "component:razorpay/blade:dropdown",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The a11y API v2 decision directly shapes Dropdown's accessibility surface.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "AFFECTS:decision:razorpay/blade:alert:action-slots->component:razorpay/blade:alert": {
+      "id": "AFFECTS:decision:razorpay/blade:alert:action-slots->component:razorpay/blade:alert",
+      "type": "AFFECTS",
+      "from": "decision:razorpay/blade:alert:action-slots",
+      "to": "component:razorpay/blade:alert",
+      "confidence": "medium",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The action slot pattern defined how Alert actions work in v2.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "AFFECTS:decision:razorpay/blade:alert:composition-api->component:razorpay/blade:alert": {
+      "id": "AFFECTS:decision:razorpay/blade:alert:composition-api->component:razorpay/blade:alert",
+      "type": "AFFECTS",
+      "from": "decision:razorpay/blade:alert:composition-api",
+      "to": "component:razorpay/blade:alert",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The composition API replaced the slot pattern as Alert's architecture.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "SUPERSEDES:decision:razorpay/blade:dropdown:accessibility-v2->decision:razorpay/blade:dropdown:controlled-only-api": {
+      "id": "SUPERSEDES:decision:razorpay/blade:dropdown:accessibility-v2->decision:razorpay/blade:dropdown:controlled-only-api",
+      "type": "SUPERSEDES",
+      "from": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "to": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "confidence": "medium",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The v2 a11y API supersedes the original controlled-only API by adding explicit accessibility controls that the first version lacked.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "SUPERSEDES:decision:razorpay/blade:alert:composition-api->decision:razorpay/blade:alert:action-slots": {
+      "id": "SUPERSEDES:decision:razorpay/blade:alert:composition-api->decision:razorpay/blade:alert:action-slots",
+      "type": "SUPERSEDES",
+      "from": "decision:razorpay/blade:alert:composition-api",
+      "to": "decision:razorpay/blade:alert:action-slots",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The compound component API in Alert v3 replaced the named slot pattern from v2, providing more extensibility.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:controlled-only-api->pull_request:razorpay/blade#1423": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:controlled-only-api->pull_request:razorpay/blade#1423",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "to": "pull_request:razorpay/blade#1423",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "PR #1423 implements and documents the controlled-only API decision.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#89": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#89",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "to": "issue:razorpay/blade#89",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "Issue #89 documents the SSR hydration problem that motivated the decision.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "REJECTED_ALTERNATIVE:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#45": {
+      "id": "REJECTED_ALTERNATIVE:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#45",
+      "type": "REJECTED_ALTERNATIVE",
+      "from": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "to": "issue:razorpay/blade#45",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "Issue #45 documents the RFC where native select was rejected in favor of a custom solution.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:accessibility-v2->pull_request:razorpay/blade#2101": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:accessibility-v2->pull_request:razorpay/blade#2101",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "to": "pull_request:razorpay/blade#2101",
+      "confidence": "medium",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "PR #2101 implements the explicit a11y API.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:accessibility-v2->issue:razorpay/blade#89": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:accessibility-v2->issue:razorpay/blade#89",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "to": "issue:razorpay/blade#89",
+      "confidence": "medium",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "Issue #89 also documents the a11y concerns that motivated the v2 API.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "IMPLEMENTS:pull_request:razorpay/blade#1423->decision:razorpay/blade:dropdown:controlled-only-api": {
+      "id": "IMPLEMENTS:pull_request:razorpay/blade#1423->decision:razorpay/blade:dropdown:controlled-only-api",
+      "type": "IMPLEMENTS",
+      "from": "pull_request:razorpay/blade#1423",
+      "to": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "PR #1423 contains the code changes that implement the controlled-only API.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "IMPLEMENTS:pull_request:razorpay/blade#2101->decision:razorpay/blade:dropdown:accessibility-v2": {
+      "id": "IMPLEMENTS:pull_request:razorpay/blade#2101->decision:razorpay/blade:dropdown:accessibility-v2",
+      "type": "IMPLEMENTS",
+      "from": "pull_request:razorpay/blade#2101",
+      "to": "decision:razorpay/blade:dropdown:accessibility-v2",
+      "confidence": "medium",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "PR #2101 contains the code that implements the a11y v2 API.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "IMPLEMENTS:commit:razorpay/blade@a1b2c3d4e5f6->decision:razorpay/blade:dropdown:controlled-only-api": {
+      "id": "IMPLEMENTS:commit:razorpay/blade@a1b2c3d4e5f6->decision:razorpay/blade:dropdown:controlled-only-api",
+      "type": "IMPLEMENTS",
+      "from": "commit:razorpay/blade@a1b2c3d4e5f6",
+      "to": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The commit contains the implementation of the controlled-only Dropdown API.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "DISCUSSED_IN:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#89": {
+      "id": "DISCUSSED_IN:decision:razorpay/blade:dropdown:controlled-only-api->issue:razorpay/blade#89",
+      "type": "DISCUSSED_IN",
+      "from": "decision:razorpay/blade:dropdown:controlled-only-api",
+      "to": "issue:razorpay/blade#89",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "linking:run_linking" },
+      "rationale": "The SSR hydration issue was discussed in Issue #89 before the decision was made.",
+      "createdAt": "2024-01-15T12:00:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:native-select-rejected->pull_request:razorpay/blade#1423": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:native-select-rejected->pull_request:razorpay/blade#1423",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:native-select-rejected",
+      "to": "pull_request:razorpay/blade#1423",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "PR #1423 documents the native select rejection with cross-platform reasoning.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    },
+    "SUPPORTED_BY:decision:razorpay/blade:dropdown:native-select-rejected->issue:razorpay/blade#45": {
+      "id": "SUPPORTED_BY:decision:razorpay/blade:dropdown:native-select-rejected->issue:razorpay/blade#45",
+      "type": "SUPPORTED_BY",
+      "from": "decision:razorpay/blade:dropdown:native-select-rejected",
+      "to": "issue:razorpay/blade#45",
+      "confidence": "high",
+      "provenance": { "source": "github", "origin": "extraction:run_dropdown_extraction" },
+      "rationale": "Issue #45 contains the RFC where native select was first evaluated and rejected.",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  }
+}

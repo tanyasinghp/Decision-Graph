@@ -1,0 +1,34 @@
+{
+  "name": "decision-graph",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reconstructs organizational decisions from engineering artifacts using Claude",
+  "scripts": {
+    "prefetch": "tsx scripts/prefetch.ts",
+    "ground-truth": "tsx scripts/fetch-ground-truth.ts",
+    "extract": "tsx scripts/extract.ts",
+    "replay": "tsx scripts/replay.ts",
+    "link": "tsx scripts/link.ts",
+    "evaluate": "tsx scripts/evaluate.ts",
+    "build-graph": "tsx scripts/build-graph.ts",
+    "export-graph": "tsx scripts/export-graph.ts",
+    "ask": "tsx scripts/ask.ts",
+    "stats": "tsx scripts/stats.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.5",
+    "octokit": "^4.0.2",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

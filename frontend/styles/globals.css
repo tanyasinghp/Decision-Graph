@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-[#0a0a0b] text-text-primary font-sans;
+  }
+
+  ::selection {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fafafa;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(161, 161, 170, 0.15);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(161, 161, 170, 0.25);
+  }
+}
+
+@layer utilities {
+  .glow-amber {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3), 0 0 24px rgba(245, 158, 11, 0.1);
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3), 0 0 24px rgba(16, 185, 129, 0.1);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.3), 0 0 24px rgba(59, 130, 246, 0.1);
+  }
+
+  .glow-red {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.3), 0 0 24px rgba(239, 68, 68, 0.1);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3), 0 0 24px rgba(168, 85, 247, 0.1);
+  }
+
+  .bg-subtle {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .border-subtle {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+}
+
+@layer components {
+  .node-decision {
+    @apply border-2 border-amber-500/60 bg-amber-500/10 rounded-xl px-4 py-3 min-w-[160px];
+  }
+
+  .node-decision-visited {
+    @apply border-amber-400 glow-amber bg-amber-500/15;
+  }
+
+  .node-decision-dim {
+    @apply border-amber-500/20 bg-amber-500/5 opacity-40;
+  }
+
+  .node-artifact {
+    @apply border-2 rounded-lg px-3 py-2 min-w-[140px];
+  }
+
+  .node-artifact-pr {
+    @apply border-emerald-500/60 bg-emerald-500/10;
+  }
+
+  .node-artifact-issue {
+    @apply border-blue-500/60 bg-blue-500/10;
+  }
+
+  .node-artifact-commit {
+    @apply border-purple-500/60 bg-purple-500/10;
+  }
+
+  .edge-animate {
+    stroke-dasharray: 8 4;
+    animation: edgeFlow 0.8s linear infinite;
+  }
+
+  @keyframes edgeFlow {
+    to {
+      stroke-dashoffset: -12;
+    }
+  }
+}

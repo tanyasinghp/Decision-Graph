@@ -1,0 +1,20 @@
+{"t":"run_started","runId":"demo-alert-evolution","component":"query","model":"claude-sonnet-4-5","ts":"2024-07-13T10:05:00.000Z"}
+{"t":"phase","name":"planning","ts":"2024-07-13T10:05:00.500Z"}
+{"t":"assistant_text","text":"Planning traversal: detected 'evolution' intent — prioritizing SUPERSEDES edges","ts":"2024-07-13T10:05:01.000Z"}
+{"t":"phase","name":"traversal","ts":"2024-07-13T10:05:01.500Z"}
+{"t":"tool_call","seq":1,"name":"search_decisions","input":{"query":"Alert evolution API change","limit":5},"ts":"2024-07-13T10:05:02.000Z"}
+{"t":"tool_result","seq":1,"summary":"Found 2 seed decisions for Alert component","bytes":900,"isError":false,"ts":"2024-07-13T10:05:02.500Z"}
+{"t":"tool_call","seq":2,"name":"traverse","input":{"decisionId":"decision:razorpay/blade:alert:action-slots","edgeTypes":["SUPERSEDES"],"direction":"in"},"ts":"2024-07-13T10:05:03.500Z"}
+{"t":"tool_result","seq":2,"summary":"SUPERSEDES chain: action-slots → composition-api","bytes":400,"isError":false,"ts":"2024-07-13T10:05:04.000Z"}
+{"t":"tool_call","seq":3,"name":"get_evidence","input":{"decisionId":"decision:razorpay/blade:alert:action-slots"},"ts":"2024-07-13T10:05:05.000Z"}
+{"t":"tool_result","seq":3,"summary":"Reading evidence from PR #891 — slot pattern motivation","bytes":2000,"isError":false,"ts":"2024-07-13T10:05:05.500Z"}
+{"t":"decision_emitted","decisionId":"decision:razorpay/blade:alert:action-slots","title":"Alert action slots instead of props","confidence":"medium","ts":"2024-07-13T10:05:06.000Z"}
+{"t":"tool_call","seq":4,"name":"get_evidence","input":{"decisionId":"decision:razorpay/blade:alert:composition-api"},"ts":"2024-07-13T10:05:07.000Z"}
+{"t":"tool_result","seq":4,"summary":"Reading evidence from PR #1567 — compound API motivation","bytes":2200,"isError":false,"ts":"2024-07-13T10:05:07.500Z"}
+{"t":"decision_emitted","decisionId":"decision:razorpay/blade:alert:composition-api","title":"Alert v3 composition API","confidence":"high","ts":"2024-07-13T10:05:08.000Z"}
+{"t":"phase","name":"reasoning","ts":"2024-07-13T10:05:08.500Z"}
+{"t":"assistant_text","text":"Constructing temporal narrative: slot pattern (2022) → composition API (2023)","ts":"2024-07-13T10:05:09.000Z"}
+{"t":"phase","name":"synthesis","ts":"2024-07-13T10:05:09.500Z"}
+{"t":"tool_call","seq":5,"name":"record_answer","input":{"answer":"The Alert component's API evolved through two major versions. Version 1 used boolean props for actions (showDismiss, showPrimaryAction), which became unwieldy as combinations grew combinatorially. Version 2 introduced named slots (primaryAction, secondaryAction, dismiss) for more flexibility. Version 3 adopted a full compound component pattern (Alert.Root, Alert.Title, Alert.Description, Alert.Actions), enabling infinite extensibility without combinatorial props. The transition from slots to composition was driven by new feature requirements (custom icons, collapsible content, toast mode) that the slot pattern couldn't accommodate without adding more slots.","certainty":"known","supportingDecisionIds":["decision:razorpay/blade:alert:action-slots","decision:razorpay/blade:alert:composition-api"],"supportingEvidenceUrls":["https://github.com/razorpay/blade/pull/891","https://github.com/razorpay/blade/pull/1567"],"missingEvidence":null,"reasoningSummary":"The evolution intent was detected from the word 'evolve', prioritizing SUPERSEDES edges. The chain showed a clear progression: props → slots → composition. Both decisions had strong evidence from their respective PRs. The composition API decision explicitly cites the slot pattern's limitations as motivation, confirming the temporal relationship."},"ts":"2024-07-13T10:05:10.000Z"}
+{"t":"tool_result","seq":5,"summary":"Answer recorded","bytes":400,"isError":false,"ts":"2024-07-13T10:05:10.500Z"}
+{"t":"run_finished","status":"completed","stats":{"toolCalls":5,"inputTokens":3800,"outputTokens":720,"costUsd":0.038,"durationMs":11000},"ts":"2024-07-13T10:05:11.000Z"}

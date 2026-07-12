@@ -1,0 +1,30 @@
+[
+  {
+    "id": "dropdown-native-select",
+    "question": "Why doesn't Dropdown use a native <select> element?",
+    "runFile": "/demo/runs/dropdown-hero.jsonl",
+    "intent": "causal",
+    "description": "Traces the reasoning chain behind a specific API decision, following SUPERSEDES and evidence edges."
+  },
+  {
+    "id": "alert-evolution",
+    "question": "How did the Alert component's API evolve over time?",
+    "runFile": "/demo/runs/alert-evolution.jsonl",
+    "intent": "evolution",
+    "description": "Walks the temporal SUPERSEDES chain to reconstruct how a component changed across versions."
+  },
+  {
+    "id": "what-if-dropdown-reverted",
+    "question": "What if the Dropdown controlled-only API were reverted?",
+    "runFile": "",
+    "intent": "counterfactual",
+    "description": "Hypothetical scenario: traces downstream effects of reverting a key decision."
+  },
+  {
+    "id": "what-if-alert-slots-kept",
+    "question": "What if Alert action slots were kept instead of v3?",
+    "runFile": "",
+    "intent": "counterfactual",
+    "description": "Hypothetical scenario: evaluates the trade-offs of stopping the Alert API evolution at v2."
+  }
+]

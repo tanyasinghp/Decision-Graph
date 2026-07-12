@@ -1,0 +1,24 @@
+{"t":"run_started","runId":"demo-dropdown-hero","component":"query","model":"claude-sonnet-4-5","ts":"2024-07-13T10:00:00.000Z"}
+{"t":"phase","name":"planning","ts":"2024-07-13T10:00:00.500Z"}
+{"t":"assistant_text","text":"Planning traversal for question: Why doesn't Dropdown use a native select element?","ts":"2024-07-13T10:00:01.000Z"}
+{"t":"phase","name":"traversal","ts":"2024-07-13T10:00:01.500Z"}
+{"t":"tool_call","seq":1,"name":"search_decisions","input":{"query":"Dropdown native select","limit":5},"ts":"2024-07-13T10:00:02.000Z"}
+{"t":"tool_result","seq":1,"summary":"Found 3 seed decisions matching 'Dropdown'","bytes":1200,"isError":false,"ts":"2024-07-13T10:00:02.500Z"}
+{"t":"tool_call","seq":2,"name":"traverse","input":{"decisionId":"decision:razorpay/blade:dropdown:controlled-only-api","edgeTypes":["SUPERSEDES"],"direction":"out"},"ts":"2024-07-13T10:00:03.500Z"}
+{"t":"tool_result","seq":2,"summary":"Following SUPERSEDES chain — found predecessor decision","bytes":800,"isError":false,"ts":"2024-07-13T10:00:04.000Z"}
+{"t":"tool_call","seq":3,"name":"get_evidence","input":{"decisionId":"decision:razorpay/blade:dropdown:controlled-only-api"},"ts":"2024-07-13T10:00:05.000Z"}
+{"t":"tool_result","seq":3,"summary":"Reading evidence from PR #1423 — SSR hydration analysis","bytes":2500,"isError":false,"ts":"2024-07-13T10:00:05.500Z"}
+{"t":"decision_emitted","decisionId":"decision:razorpay/blade:dropdown:controlled-only-api","title":"Dropdown uses controlled-only API","confidence":"high","ts":"2024-07-13T10:00:06.000Z"}
+{"t":"tool_call","seq":4,"name":"get_evidence","input":{"decisionId":"decision:razorpay/blade:dropdown:controlled-only-api","evidenceIndex":1},"ts":"2024-07-13T10:00:07.000Z"}
+{"t":"tool_result","seq":4,"summary":"Reading evidence from Issue #89 — hydration bug report","bytes":1800,"isError":false,"ts":"2024-07-13T10:00:07.500Z"}
+{"t":"tool_call","seq":5,"name":"traverse","input":{"decisionId":"decision:razorpay/blade:dropdown:controlled-only-api","edgeTypes":["REJECTED_ALTERNATIVE"],"direction":"out"},"ts":"2024-07-13T10:00:08.500Z"}
+{"t":"tool_result","seq":5,"summary":"Following REJECTED_ALTERNATIVE — native select was considered","bytes":600,"isError":false,"ts":"2024-07-13T10:00:09.000Z"}
+{"t":"tool_call","seq":6,"name":"get_evidence","input":{"decisionId":"decision:razorpay/blade:dropdown:native-select-rejected"},"ts":"2024-07-13T10:00:10.000Z"}
+{"t":"tool_result","seq":6,"summary":"Reading evidence from Issue #45 — RFC cross-platform analysis","bytes":1500,"isError":false,"ts":"2024-07-13T10:00:10.500Z"}
+{"t":"assistant_text","text":"Evidence confidence verified — both PR #1423 and Issue #89 have verbatim excerpts that directly support the controlled-only decision.","ts":"2024-07-13T10:00:11.000Z"}
+{"t":"phase","name":"reasoning","ts":"2024-07-13T10:00:11.500Z"}
+{"t":"assistant_text","text":"Generating reasoning context from 2 decisions and 4 evidence items...","ts":"2024-07-13T10:00:12.000Z"}
+{"t":"phase","name":"synthesis","ts":"2024-07-13T10:00:12.500Z"}
+{"t":"tool_call","seq":7,"name":"record_answer","input":{"answer":"The Dropdown component chose a controlled-only API because SSR hydration bugs made uncontrolled inputs unreliable (PR #1423). Three alternatives were considered and rejected: native select (cross-platform styling), uncontrolled+ref (hydration bugs), and hybrid (complexity). Two trade-offs were accepted: re-render cost and API surface area. The native select was specifically rejected because Blade targets both web and React Native, and native select rendering differs across platforms (Issue #45).","certainty":"likely","supportingDecisionIds":["decision:razorpay/blade:dropdown:controlled-only-api","decision:razorpay/blade:dropdown:native-select-rejected"],"supportingEvidenceUrls":["https://github.com/razorpay/blade/pull/1423","https://github.com/razorpay/blade/issues/89","https://github.com/razorpay/blade/issues/45"],"missingEvidence":"No experimental validation or A/B test results were found comparing controlled vs uncontrolled performance metrics.","reasoningSummary":"The extraction agent identified three decisions in the Dropdown cluster. The 'controlled-only API' decision had high-confidence evidence with verbatim excerpts from PR #1423 and Issue #89. The 'native select rejected' decision provided cross-platform reasoning from Issue #45. Certainty capped at 'likely' because one supporting decision had medium confidence."},"ts":"2024-07-13T10:00:13.000Z"}
+{"t":"tool_result","seq":7,"summary":"Answer recorded (certainty capped: proposed 'known' → final 'likely' due to medium-confidence supporting decision)","bytes":450,"isError":false,"ts":"2024-07-13T10:00:13.500Z"}
+{"t":"run_finished","status":"completed","stats":{"toolCalls":7,"inputTokens":4200,"outputTokens":850,"costUsd":0.042,"durationMs":14000},"ts":"2024-07-13T10:00:14.000Z"}

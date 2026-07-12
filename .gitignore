@@ -1,0 +1,37 @@
+node_modules/
+data/cache/
+data/ground-truth/
+data/runs/
+*.log
+
+
+# Documentation not to be committed
+SHOWCASE_READY.md
+demo-choreography.md
+demo-experience.md
+decision-graph-build-spec.md
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment
+.env
+.env.*
+
+!.env.example
+
+# Database
+*.db
+*.db-journal
+
+
+# Build
+dist/
+build/
+
+# macOS
+.DS_Store
