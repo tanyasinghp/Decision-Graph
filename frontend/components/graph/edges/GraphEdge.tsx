@@ -34,13 +34,18 @@ function GraphEdgeInner({
   const color = getEdgeHexColor(edgeType);
   const dashArray = getEdgeDashArray(edgeType);
 
-  const isDim = state === "dim";
-  const isTraversed = state === "traversed" || state === "visible";
+  // COLOR DIET (plan §15): edges are quiet neutrals at rest and earn color
+  // + glow ONLY when traversed by reasoning. Rejected alternatives keep
+  // their red dash as standing semantics even at rest.
+  const isDim = state === "dim" || state === "faded";
+  const isTraversed = state === "traversed";
+  const isRejected = edgeType === "REJECTED_ALTERNATIVE";
+  const restStroke = isRejected ? "#ef444466" : "#3f3f46";
 
   return (
     <>
-      {/* Arrow marker — only render for visible/traversed edges */}
-      {!isDim && (
+      {/* Arrow marker — only for edges that currently carry meaning */}
+      {isTraversed && (
         <defs>
           <marker
             id={`arrow-${edgeType}`}
@@ -61,11 +66,11 @@ function GraphEdgeInner({
         id={id}
         path={edgePath}
         style={{
-          stroke: isDim ? "#3f3f46" : color,
-          strokeWidth: isDim ? 1 : isTraversed ? 2.5 : 2,
+          stroke: isTraversed ? color : restStroke,
+          strokeWidth: isTraversed ? 2.5 : isDim ? 1 : 1.5,
           strokeDasharray: dashArray,
-          opacity: isDim ? 0.3 : isTraversed ? 0.9 : 0.5,
-          markerEnd: isDim ? undefined : `url(#arrow-${edgeType})`,
+          opacity: isTraversed ? 0.9 : isDim ? 0.25 : 0.55,
+          markerEnd: isTraversed ? `url(#arrow-${edgeType})` : undefined,
           transition: "all 0.5s ease",
         }}
       />

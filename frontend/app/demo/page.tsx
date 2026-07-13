@@ -17,6 +17,7 @@ import { GraphCanvas } from "@/components/graph/GraphCanvas";
 import { ReasoningTimeline } from "@/components/reasoning/ReasoningTimeline";
 import { AnswerPanel } from "@/components/query/AnswerPanel";
 import { CounterfactualPanel } from "@/components/query/CounterfactualPanel";
+import { CounterfactualSummary } from "@/components/query/CounterfactualSummary";
 import { EvidenceDrawer } from "@/components/evidence/EvidenceDrawer";
 import { useReasoningStream } from "@/hooks/useReasoningStream";
 
@@ -173,6 +174,14 @@ export default function DemoPage() {
   const hasQuery = mode !== "idle" && mode !== "ready";
   const isCounterfactual = mode === "counterfactual";
 
+  // Layout phase drives panel proportions (plan §8): the layout itself
+  // guides attention — graph-dominant while thinking, answer-dominant after.
+  const layoutPhase = isCounterfactual
+    ? ("counterfactual" as const)
+    : isPlaying || !state.answer
+      ? ("replaying" as const)
+      : ("answered" as const);
+
   return (
     <main className="min-h-screen bg-[#0a0a0b] flex flex-col">
       <AppHeader />
@@ -220,6 +229,7 @@ export default function DemoPage() {
           {hasQuery ? (
             <div className="relative h-full w-full">
               <ThreeColumnLayout
+                phase={layoutPhase}
                 left={<GraphCanvas isEmpty={false} />}
                 center={
                   isCounterfactual ? (
@@ -230,17 +240,7 @@ export default function DemoPage() {
                 }
                 right={
                   isCounterfactual ? (
-                    <div className="h-full flex items-center justify-center text-center px-6">
-                      <div>
-                        <p className="text-small text-text-tertiary mb-1">
-                          Counterfactual Mode
-                        </p>
-                        <p className="text-caption text-text-tertiary/60">
-                          The right panel shows a structured analysis. Use the
-                          center panel to explore the counterfactual result.
-                        </p>
-                      </div>
-                    </div>
+                    <CounterfactualSummary />
                   ) : (
                     <AnswerPanel />
                   )

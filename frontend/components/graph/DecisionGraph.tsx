@@ -75,18 +75,20 @@ function DecisionGraphInner() {
     return last;
   }, [highlightedNodeIds]);
 
-  // Apply states
+  // Apply states — layout.edges included so the frontier tier ("reachable
+  // next") can be computed from adjacency (4-tier visibility, plan §6).
   const displayNodes = useMemo(
     () =>
       applyNodeStates(
         layout.nodes,
+        layout.edges,
         highlightedNodeIds,
         visitedNodesRef.current,
         focusedId,
         hypotheticalNodeIds,
         predictedNodeIds,
       ),
-    [layout.nodes, highlightedNodeIds, focusedId, hypotheticalNodeIds, predictedNodeIds],
+    [layout.nodes, layout.edges, highlightedNodeIds, focusedId, hypotheticalNodeIds, predictedNodeIds],
   );
 
   const displayEdges = useMemo(
@@ -135,7 +137,7 @@ function DecisionGraphInner() {
       nodesConnectable={false}
       elementsSelectable={false}
       zoomOnScroll={false}
-      panOnDrag={false}
+      panOnDrag
       onNodeClick={onNodeClick}
       onPaneClick={onPaneClick}
       proOptions={{ hideAttribution: true }}
@@ -146,23 +148,21 @@ function DecisionGraphInner() {
         showInteractive={false}
         className="!bg-surface/80 !backdrop-blur-sm !border !border-border !rounded-lg"
       />
-      <MiniMap
-        nodeStrokeColor="rgba(255,255,255,0.1)"
-        nodeColor="rgba(255,255,255,0.05)"
-        nodeBorderRadius={4}
-        maskColor="rgba(0,0,0,0.7)"
-        style={{
-          background: "#0a0a0b",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 8,
-        }}
-      />
+      {/* MiniMap removed (plan §11): with lean-in camera the whole graph
+          stays visible, so a minimap is redundant dashboard vocabulary. */}
 
       {/* Label */}
       <div className="absolute top-3 left-3 z-10 pointer-events-none">
         <span className="text-caption text-text-tertiary px-2 py-1 rounded bg-[#0a0a0b]/80 backdrop-blur-sm border border-border">
           Decision Graph
         </span>
+      </div>
+
+      {/* Time axis caption — the strata layout's one legend (plan §9) */}
+      <div className="absolute bottom-3 left-3 z-10 pointer-events-none flex items-center gap-2">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-text-tertiary/70">older</span>
+        <div className="w-16 h-px bg-gradient-to-r from-white/10 to-accent/50" />
+        <span className="text-[10px] uppercase tracking-[0.2em] text-accent/70">newer</span>
       </div>
 
       {/* Zoom controls */}
