@@ -147,12 +147,15 @@ function EvidenceCardInner({ card, index }: EvidenceCardProps) {
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
-      <div className="p-3 space-y-2">
-        {/* Header: Icon + Kind + Confidence */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      {/* Compact card (refinement §6): header carries kind + confidence +
+          link; one-line excerpt; provenance chain kept (it IS the story:
+          artifact → relation → decision); redundant URL footer removed.
+          ~30% shorter → more evidence visible without scrolling. */}
+      <div className="px-3 py-2 space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className={cn("flex-shrink-0", iconColor)}>{icon}</span>
-            <span className="text-caption font-medium text-text-secondary">
+            <span className="text-caption font-medium text-text-secondary truncate">
               {card.kind === "pr"
                 ? "Pull Request"
                 : card.kind === "rfc"
@@ -160,29 +163,32 @@ function EvidenceCardInner({ card, index }: EvidenceCardProps) {
                   : card.kind.charAt(0).toUpperCase() + card.kind.slice(1)}
             </span>
           </div>
-          <span
-            className={cn(
-              "text-caption px-1.5 py-0.5 rounded border font-medium",
-              confStyle,
-            )}
-          >
-            {card.confidence}
-          </span>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className={cn("text-caption px-1.5 py-0.5 rounded border font-medium", confStyle)}>
+              {card.confidence}
+            </span>
+            <a
+              href={card.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="p-0.5 text-text-tertiary hover:text-accent transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </div>
 
-        {/* Title */}
         <p className="text-small text-text-primary font-medium leading-snug line-clamp-2">
           {card.title}
         </p>
 
-        {/* Excerpt */}
-        <p className="text-caption text-text-tertiary leading-relaxed line-clamp-2">
-          {truncate(card.excerpt, 140)}
+        <p className="text-caption text-text-tertiary leading-snug line-clamp-1">
+          {truncate(card.excerpt, 110)}
         </p>
 
-        {/* Provenance chain */}
-        <div className="flex items-center gap-1.5 text-caption text-text-tertiary pt-0.5">
-          <span className="text-text-secondary font-medium truncate max-w-[120px]">
+        <div className="flex items-center gap-1.5 text-caption text-text-tertiary">
+          <span className="text-text-secondary font-medium truncate max-w-[110px]">
             {card.url.split("/").pop()}
           </span>
           <span className="text-text-tertiary/60">→</span>
@@ -190,27 +196,11 @@ function EvidenceCardInner({ card, index }: EvidenceCardProps) {
             {getEdgeTypeLabel(card.relationType)}
           </span>
           <span className="text-text-tertiary/60">→</span>
-          <span className="text-text-secondary truncate max-w-[120px]">
+          <span className="text-text-secondary truncate max-w-[110px]">
             {card.sourceDecisionLabel.length > 25
               ? card.sourceDecisionLabel.slice(0, 25) + "…"
               : card.sourceDecisionLabel}
           </span>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between text-caption text-text-tertiary pt-0.5 border-t border-border/50">
-          <span className="truncate">
-            {card.url.replace("https://github.com/", "")}
-          </span>
-          <a
-            href={card.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="flex-shrink-0 p-0.5 hover:text-accent transition-colors"
-          >
-            <ExternalLink className="w-3 h-3" />
-          </a>
         </div>
       </div>
     </motion.div>

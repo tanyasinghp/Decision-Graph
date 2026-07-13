@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RunEvent } from "@/lib/types";
-import { getEventDescription, getEventIcon } from "@/hooks/useReasoningStream";
+import { getEventIcon } from "@/hooks/useReasoningStream";
+import { narrateEvent } from "@/lib/narrate";
 
 interface ReasoningEventProps {
   event: RunEvent;
@@ -147,7 +148,7 @@ export const ReasoningEvent = memo(function ReasoningEvent({ event, isLatest, in
                 : "text-text-secondary",
           )}
         >
-          {getEventDescription(event)}
+          {narrateEvent(event)}
         </p>
       </div>
     </motion.div>

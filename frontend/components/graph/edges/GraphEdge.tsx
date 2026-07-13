@@ -39,6 +39,7 @@ function GraphEdgeInner({
   // their red dash as standing semantics even at rest.
   const isDim = state === "dim" || state === "faded";
   const isTraversed = state === "traversed";
+  const isVisited = state === "visited"; // afterglow: tinted, never glowing
   const isRejected = edgeType === "REJECTED_ALTERNATIVE";
   const restStroke = isRejected ? "#ef444466" : "#3f3f46";
 
@@ -66,10 +67,10 @@ function GraphEdgeInner({
         id={id}
         path={edgePath}
         style={{
-          stroke: isTraversed ? color : restStroke,
-          strokeWidth: isTraversed ? 2.5 : isDim ? 1 : 1.5,
+          stroke: isTraversed ? color : isVisited ? color : restStroke,
+          strokeWidth: isTraversed ? 2.5 : isVisited ? 1.5 : isDim ? 1 : 1.5,
           strokeDasharray: dashArray,
-          opacity: isTraversed ? 0.9 : isDim ? 0.25 : 0.55,
+          opacity: isTraversed ? 0.9 : isVisited ? 0.4 : isDim ? 0.25 : 0.55,
           markerEnd: isTraversed ? `url(#arrow-${edgeType})` : undefined,
           transition: "all 0.5s ease",
         }}

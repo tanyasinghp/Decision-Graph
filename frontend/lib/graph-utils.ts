@@ -82,7 +82,7 @@ export interface FlowNodeData {
 export interface FlowEdgeData {
   edgeType: EdgeType;
   edge: GraphEdge;
-  state: "dim" | "faded" | "visible" | "traversed" | "hypothetical";
+  state: "dim" | "faded" | "visible" | "visited" | "traversed" | "hypothetical";
 }
 
 export type FlowNode = Node<FlowNodeData>;
@@ -126,10 +126,18 @@ export function buildLayout(store: GraphStore): { nodes: FlowNode[]; edges: Flow
     lastCompX = x;
   }
 
-  /* Band 2+ — evidence artifacts, stacked beneath their anchor decision. */
+  /* Band 2+ — evidence clusters beneath their anchor decision; REJECTED
+     alternatives branch SIDEWAYS from the decision (a visible fork in the
+     road), so supporting evidence and roads-not-taken read differently at
+     a glance (refinement §1). */
   const artifactTypes: NodeType[] = ["issue", "pull_request", "commit", "document", "experiment", "metric"];
-  const stacks = new Map<string, GraphNode[]>(); // anchor decision id → artifacts
+  const stacks = new Map<string, GraphNode[]>();      // anchor → supporting artifacts
+  const sideBranches = new Map<string, GraphNode[]>(); // anchor → rejected-alternative artifacts
   const orphans: GraphNode[] = [];
+
+  const rejectedTargets = new Set(
+    allEdges.filter((e) => e.type === "REJECTED_ALTERNATIVE").map((e) => e.to),
+  );
 
   for (const n of allNodes.filter((a) => artifactTypes.includes(a.type))) {
     const connected = allEdges
@@ -138,9 +146,10 @@ export function buildLayout(store: GraphStore): { nodes: FlowNode[]; edges: Flow
       .filter((id) => pos.has(id) && decisions.some((d) => d.id === id));
     const anchor = connected[0];
     if (anchor) {
-      const stack = stacks.get(anchor) ?? [];
-      stack.push(n);
-      stacks.set(anchor, stack);
+      const bucket = rejectedTargets.has(n.id) ? sideBranches : stacks;
+      const list = bucket.get(anchor) ?? [];
+      list.push(n);
+      bucket.set(anchor, list);
     } else {
       orphans.push(n);
     }
@@ -150,6 +159,15 @@ export function buildLayout(store: GraphStore): { nodes: FlowNode[]; edges: Flow
     stack
       .sort((a, b) => a.id.localeCompare(b.id))
       .forEach((n, i) => pos.set(n.id, { x: ax, y: BAND_EVIDENCE_Y + i * EVIDENCE_STACK_GAP }));
+  }
+  for (const [anchor, branch] of sideBranches) {
+    const a = pos.get(anchor)!;
+    branch
+      .sort((x, y) => x.id.localeCompare(y.id))
+      .forEach((n, i) =>
+        // Sideways fork: up-left of the decision, diagonal steps.
+        pos.set(n.id, { x: a.x - 250 - i * 40, y: a.y - 130 - i * 78 }),
+      );
   }
 
   /* Everything else (actors, orphans) — quiet right-hand margin. */
@@ -256,27 +274,32 @@ export function applyEdgeStates(
   const reasoningActive = highlightedIds.length > 0 || traversedIds.size > 0;
 
   return edges.map((edge) => {
+    // ONE glow at a time: edges highlighted by the CURRENT event are
+    // "traversed" (bright); edges from earlier events fall back to
+    // "visited" (medium tint, no glow). Electricity, then afterglow.
     let state: FlowEdgeData["state"];
     if (hypotheticalIds.includes(edge.id)) state = "hypothetical";
-    else if (traversedIds.has(edge.id)) state = "traversed";
     else if (highlightedIds.includes(edge.id)) state = "traversed";
+    else if (traversedIds.has(edge.id)) state = "visited";
     else if (reasoningActive) state = "dim";
     else state = "visible";
 
     const edgeType = edge.data?.edgeType ?? "SUPPORTED_BY";
 
     // COLOR DIET (§15): edges are neutral at rest and earn color only when
-    // traversed. Rejected alternatives keep red as standing semantics.
+    // reasoning touches them. Rejected alternatives keep red semantics.
     const style =
       state === "traversed"
         ? { stroke: getEdgeHexColor(edgeType), strokeWidth: 2.5 }
-        : state === "hypothetical"
-          ? { stroke: "#a855f7", strokeWidth: 2, opacity: 0.5, strokeDasharray: "6 4" }
-          : state === "visible"
-            ? edgeType === "REJECTED_ALTERNATIVE"
-              ? { stroke: "#ef444455", strokeWidth: 1.5, strokeDasharray: "8 4" }
-              : { stroke: "#3f3f46", strokeWidth: 1.5 }
-            : { stroke: "#27272a", strokeWidth: 1, opacity: 0.6 };
+        : state === "visited"
+          ? { stroke: getEdgeHexColor(edgeType), strokeWidth: 1.5, opacity: 0.45 }
+          : state === "hypothetical"
+            ? { stroke: "#a855f7", strokeWidth: 2, opacity: 0.5, strokeDasharray: "6 4" }
+            : state === "visible"
+              ? edgeType === "REJECTED_ALTERNATIVE"
+                ? { stroke: "#ef444455", strokeWidth: 1.5, strokeDasharray: "8 4" }
+                : { stroke: "#3f3f46", strokeWidth: 1.5 }
+              : { stroke: "#27272a", strokeWidth: 1, opacity: 0.6 };
 
     return {
       ...edge,

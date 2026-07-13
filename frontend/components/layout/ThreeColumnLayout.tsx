@@ -18,8 +18,8 @@ import { cn } from "@/lib/utils";
 export type LayoutPhase = "replaying" | "answered" | "counterfactual";
 
 const PROPORTIONS: Record<LayoutPhase, [number, number, number]> = {
-  replaying: [52, 28, 20],
-  answered: [45, 20, 35],
+  replaying: [50, 25, 25],
+  answered: [42, 23, 35],
   counterfactual: [46, 30, 24],
 };
 
@@ -52,9 +52,12 @@ export function ThreeColumnLayout({
         transition: "grid-template-columns 600ms cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
-      <div className="border-r border-border min-h-0 overflow-hidden">{left}</div>
-      <div className="border-r border-border min-h-0 overflow-hidden">{center}</div>
-      <div className="min-h-0 overflow-hidden">{right}</div>
+      {/* Panel contrast (refinement §8): three near-black strata — the eye
+          reads separate rooms without any bright chrome. Graph darkest
+          (stage), timeline slightly lifted, answer lifted again. */}
+      <div className="border-r border-border min-h-0 overflow-hidden bg-[#0a0a0a]">{left}</div>
+      <div className="border-r border-border min-h-0 overflow-hidden bg-[#0d0d10]">{center}</div>
+      <div className="min-h-0 overflow-hidden bg-[#0f0f13]">{right}</div>
     </div>
   );
 }

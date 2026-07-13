@@ -79,18 +79,31 @@ export function useReasoningStream() {
             });
           }
 
-          // Apply highlights
-          if (scene.highlightedNodeIds.length > 0) {
-            dispatch({
-              type: "HIGHLIGHT_NODES",
-              ids: scene.highlightedNodeIds,
-            });
-          }
-          if (scene.highlightedEdgeIds.length > 0) {
-            dispatch({
-              type: "HIGHLIGHT_EDGES",
-              ids: scene.highlightedEdgeIds,
-            });
+          // Apply highlights — SEQUENTIALLY (edge → node → edge → node),
+          // like electricity moving through the graph. Presentation-only:
+          // the scene's highlight set is exactly what the orchestrator
+          // computed; only its reveal is staggered. computeHighlights pushes
+          // the origin first and neighbors in edge order, so pairing
+          // edge[i] with node[i+1] follows the true traversal.
+          if (scene.highlightedNodeIds.length > 0 || scene.highlightedEdgeIds.length > 0) {
+            const nodes = scene.highlightedNodeIds;
+            const edges = scene.highlightedEdgeIds;
+            // Origin ignites first.
+            dispatch({ type: "HIGHLIGHT_NODES", ids: nodes.slice(0, 1) });
+            dispatch({ type: "HIGHLIGHT_EDGES", ids: [] });
+            const steps = Math.min(edges.length, 6); // keep pace at high fan-out
+            for (let s = 0; s < steps; s++) {
+              if (abortRef.current) break;
+              await sleep(120 / speedRef.current);
+              // Edge lights…
+              dispatch({ type: "HIGHLIGHT_EDGES", ids: edges.slice(0, s + 1) });
+              await sleep(80 / speedRef.current);
+              // …then the node it reaches.
+              dispatch({ type: "HIGHLIGHT_NODES", ids: nodes.slice(0, Math.min(s + 2, nodes.length)) });
+            }
+            // Everything beyond the cadence cap lands together.
+            dispatch({ type: "HIGHLIGHT_NODES", ids: nodes });
+            dispatch({ type: "HIGHLIGHT_EDGES", ids: edges });
           }
 
           // Apply answer phase (for answer reveal sub-scenes)

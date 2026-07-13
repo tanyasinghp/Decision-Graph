@@ -144,6 +144,17 @@ function DecisionGraphInner() {
       className="bg-[#0a0a0b]"
     >
       <Background color="rgba(255,255,255,0.03)" gap={24} size={1} />
+
+      {/* Depth vignette — a faint amber radial behind the spine so the
+          canvas reads as a lit stage, not empty black (refinement §1).
+          pointer-events-none, zero interaction cost. */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 45%, rgba(245,158,11,0.04), transparent 70%)",
+        }}
+      />
       <Controls
         showInteractive={false}
         className="!bg-surface/80 !backdrop-blur-sm !border !border-border !rounded-lg"

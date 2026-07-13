@@ -56,8 +56,9 @@ export function useGraphController() {
 
     if (target) {
       const base = baseZoomRef.current ?? getZoom();
-      // Lean-in ceiling: 22% past baseline, hard-capped, never below baseline.
-      const zoom = Math.max(base, Math.min(base * 1.22, base + 0.28));
+      // Lean-in ceiling: 18% past baseline (refinement §10: 15–20% max),
+      // hard-capped, never below baseline. Pan does the work; zoom whispers.
+      const zoom = Math.max(base, Math.min(base * 1.18, base + 0.22));
       const x = target.position.x + ((target.width as number) ?? 220) / 2;
       const y = target.position.y + ((target.height as number) ?? 80) / 2;
       setCenter(x, y, { zoom, duration: 900 });
