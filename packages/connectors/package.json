@@ -1,0 +1,11 @@
+{
+  "name": "@dg/connectors",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph connectors — GitHub (Connector #1), normalization, and the federated evidence view. Depends on @dg/core ports + @dg/engine; contains no reasoning logic.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  }
+}

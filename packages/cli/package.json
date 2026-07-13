@@ -1,0 +1,12 @@
+{
+  "name": "@dg/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph CLI (dg) — the first presentation layer over DecisionGraphEngine. Depends only on @dg/core + the composition-root wiring (@dg/workspace-local, @dg/connectors).",
+  "bin": { "dg": "./bin/dg.ts" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  }
+}

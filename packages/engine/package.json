@@ -1,0 +1,10 @@
+{
+  "name": "@dg/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph Phase 1 reasoning services — extraction, graph, query, validation, evidence, llm. Reused unchanged; depends only on @dg/domain.",
+  "exports": {
+    "./*.js": "./src/*.ts"
+  }
+}

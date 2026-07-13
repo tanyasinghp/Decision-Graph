@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "Reconstructs organizational decisions from engineering artifacts using Claude",
+  "workspaces": ["packages/*"],
   "scripts": {
+    "dg": "tsx packages/cli/bin/dg.ts",
     "prefetch": "tsx scripts/prefetch.ts",
     "ground-truth": "tsx scripts/fetch-ground-truth.ts",
     "extract": "tsx scripts/extract.ts",

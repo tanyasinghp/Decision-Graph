@@ -1,0 +1,11 @@
+{
+  "name": "@dg/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph domain model — schemas, types, graph model, errors. No dependencies beyond zod.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  }
+}

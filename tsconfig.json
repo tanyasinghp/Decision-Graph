@@ -13,7 +13,22 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@dg/domain": ["packages/domain/src/index.ts"],
+      "@dg/domain/*": ["packages/domain/src/*"],
+      "@dg/engine": ["packages/engine/src/index.ts"],
+      "@dg/engine/*": ["packages/engine/src/*"],
+      "@dg/core": ["packages/core/src/index.ts"],
+      "@dg/core/*": ["packages/core/src/*"],
+      "@dg/connectors": ["packages/connectors/src/index.ts"],
+      "@dg/connectors/*": ["packages/connectors/src/*"],
+      "@dg/workspace-local": ["packages/workspace-local/src/index.ts"],
+      "@dg/workspace-local/*": ["packages/workspace-local/src/*"],
+      "@dg/cli": ["packages/cli/src/index.ts"],
+      "@dg/cli/*": ["packages/cli/src/*"]
+    }
   },
-  "include": ["src/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
+  "include": ["packages/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]
 }

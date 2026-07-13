@@ -1,0 +1,11 @@
+{
+  "name": "@dg/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph application core — WorkflowEngine, EventBus, checkpoints, catalog, and the DecisionGraphEngine facade. Orchestrates @dg/engine services; contains no reasoning logic.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  }
+}

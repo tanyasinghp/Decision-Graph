@@ -4,7 +4,7 @@
  */
 
 import "dotenv/config";
-import { ConfigError } from "../../src/domain/errors.js";
+import { ConfigError } from "@dg/domain/errors.js";
 
 export function parseArgs(argv: string[]): { flags: Map<string, string[]>; bools: Set<string> } {
   const flags = new Map<string, string[]>();

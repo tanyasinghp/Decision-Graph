@@ -1,27 +1,30 @@
 /**
- * scripts/ask.ts — ask the Decision Graph a question.
+ * scripts/ask.ts — thin wrapper over engine.ask().
  * Usage: npm run ask -- --repo razorpay/blade --question "Why is Dropdown controlled-only?"
  */
 
-import { JsonGraphStore } from "../src/graph/GraphStore.js";
-import { QueryEngine } from "../src/query/QueryEngine.js";
-import { AnthropicClient } from "../src/llm/AnthropicClient.js";
-import { DATA_DIR, parseArgs, requireEnv, requireFlag } from "./lib/cli.js";
+import { parseArgs, requireFlag } from "./lib/cli.js";
+import { platform } from "./lib/platform.js";
 
 async function main(): Promise<void> {
   const { flags } = parseArgs(process.argv.slice(2));
   const repo = requireFlag(flags, "repo");
   const question = requireFlag(flags, "question");
-  const model = flags.get("model")?.[0] ?? process.env.DG_MODEL ?? "claude-sonnet-4-5";
+  const { engine, workspace } = await platform(repo, { model: flags.get("model")?.[0] });
 
-  const engine = new QueryEngine(
-    new AnthropicClient(requireEnv("ANTHROPIC_API_KEY"), model),
-    new JsonGraphStore(DATA_DIR, repo),
-    repo
-  );
+  const r = await engine.ask({ workspace, question });
+  if (r.status !== "completed" || !r.answer) {
+    console.error(`[ask] ${r.status}${r.error ? ": " + r.error.message : ""}`);
+    process.exit(1);
+  }
 
-  const result = await engine.answerQuestion(question);
-  console.log("\n" + engine.traceReasoning(result) + "\n");
+  const a = r.answer;
+  console.log(`\nQuestion: ${question}`);
+  console.log(`↓ intent: ${r.reasoning?.intent} (rule: ${r.reasoning?.matchedRule})`);
+  console.log(`↓ evidence nodes: ${r.evidence?.join(", ") || "(none)"}`);
+  console.log(`↓ supporting decisions: ${a.supportingDecisionIds.join(", ") || "(none)"}`);
+  console.log(`↓ certainty: ${a.certainty}`);
+  console.log(`\nAnswer: ${a.answer}\n`);
 }
 
 main().catch((e) => {

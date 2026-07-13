@@ -9,16 +9,16 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { AgentLoop, type AgentLoopConfig } from "../src/agent/AgentLoop.js";
-import { EvidenceVerifier } from "../src/agent/EvidenceVerifier.js";
-import { registerExtractionTools } from "../src/agent/extractionTools.js";
-import { RunLog } from "../src/agent/RunLog.js";
-import { ToolRuntime } from "../src/agent/ToolRuntime.js";
-import { loadPrompt } from "../src/agent/prompts.js";
-import { CacheStore } from "../src/evidence/CacheStore.js";
-import { CachedEvidenceRepository } from "../src/evidence/EvidenceRepository.js";
-import type { LlmClient, LlmRequest, LlmResponse } from "../src/llm/LlmClient.js";
-import type { DecisionObject, RunEvent } from "../src/domain/types.js";
+import { AgentLoop, type AgentLoopConfig } from "@dg/engine/agent/AgentLoop.js";
+import { EvidenceVerifier } from "@dg/engine/agent/EvidenceVerifier.js";
+import { registerExtractionTools } from "@dg/engine/agent/extractionTools.js";
+import { RunLog } from "@dg/engine/agent/RunLog.js";
+import { ToolRuntime } from "@dg/engine/agent/ToolRuntime.js";
+import { loadPrompt } from "@dg/engine/agent/prompts.js";
+import { CacheStore } from "@dg/engine/evidence/CacheStore.js";
+import { CachedEvidenceRepository } from "@dg/engine/evidence/EvidenceRepository.js";
+import type { LlmClient, LlmRequest, LlmResponse } from "@dg/engine/llm/LlmClient.js";
+import type { DecisionObject, RunEvent } from "@dg/domain/types.js";
 import { z } from "zod";
 
 /* ---------------- Fake model ---------------- */

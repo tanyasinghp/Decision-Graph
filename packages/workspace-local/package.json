@@ -1,0 +1,11 @@
+{
+  "name": "@dg/workspace-local",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local filesystem WorkspaceProvider over the existing data/ layout. Implements the @dg/core Workspace ports; a RemoteWorkspaceProvider can replace it without touching the Workflow Engine.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  }
+}

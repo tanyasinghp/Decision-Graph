@@ -18,8 +18,8 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { GitHubFetcher, createOctokit } from "../src/evidence/GitHubFetcher.js";
-import { isForbiddenPath } from "../src/evidence/guards.js";
+import { GitHubFetcher, createOctokit } from "@dg/engine/evidence/GitHubFetcher.js";
+import { isForbiddenPath } from "@dg/engine/evidence/guards.js";
 import { DATA_DIR, parseArgs, requireEnv, requireFlag } from "./lib/cli.js";
 
 async function main(): Promise<void> {

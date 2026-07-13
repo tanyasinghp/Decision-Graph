@@ -6,8 +6,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { DecisionInputSchema, EvidenceSchema } from "../src/domain/schemas.js";
-import { EDGE_RULES, EdgeTypeSchema } from "../src/domain/graph.js";
+import { DecisionInputSchema, EvidenceSchema } from "@dg/domain/schemas.js";
+import { EDGE_RULES, EdgeTypeSchema } from "@dg/domain/graph.js";
 
 const validEvidence = {
   id: "pr-1234",

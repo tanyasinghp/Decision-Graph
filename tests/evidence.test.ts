@@ -7,11 +7,11 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { CacheStore } from "../src/evidence/CacheStore.js";
-import { CachedEvidenceRepository } from "../src/evidence/EvidenceRepository.js";
-import { GitHubFetcher, type OctokitLike } from "../src/evidence/GitHubFetcher.js";
-import { CacheMissError, ForbiddenPathError } from "../src/domain/errors.js";
-import type { IssueThread, PrThread } from "../src/domain/types.js";
+import { CacheStore } from "@dg/engine/evidence/CacheStore.js";
+import { CachedEvidenceRepository } from "@dg/engine/evidence/EvidenceRepository.js";
+import { GitHubFetcher, type OctokitLike } from "@dg/engine/evidence/GitHubFetcher.js";
+import { CacheMissError, ForbiddenPathError } from "@dg/domain/errors.js";
+import type { IssueThread, PrThread } from "@dg/domain/types.js";
 
 let tmp: string;
 beforeEach(() => { tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dg-test-")); });

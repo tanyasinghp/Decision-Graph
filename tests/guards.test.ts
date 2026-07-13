@@ -4,8 +4,8 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { isForbiddenPath, assertAllowedPath } from "../src/evidence/guards.js";
-import { ForbiddenPathError } from "../src/domain/errors.js";
+import { isForbiddenPath, assertAllowedPath } from "@dg/engine/evidence/guards.js";
+import { ForbiddenPathError } from "@dg/domain/errors.js";
 
 describe("isForbiddenPath", () => {
   it("blocks the canonical ground-truth path", () => {
