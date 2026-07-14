@@ -27,7 +27,9 @@
       "@dg/workspace-local": ["packages/workspace-local/src/index.ts"],
       "@dg/workspace-local/*": ["packages/workspace-local/src/*"],
       "@dg/cli": ["packages/cli/src/index.ts"],
-      "@dg/cli/*": ["packages/cli/src/*"]
+      "@dg/cli/*": ["packages/cli/src/*"],
+      "@dg/mcp": ["packages/mcp/src/index.ts"],
+      "@dg/mcp/*": ["packages/mcp/src/*"]
     }
   },
   "include": ["packages/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts"]

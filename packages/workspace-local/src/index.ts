@@ -15,3 +15,4 @@ export { LocalEvidenceStore } from "./LocalEvidenceStore.js";
 export { LocalRunStore } from "./LocalRunStore.js";
 export { LocalCheckpointStore } from "./LocalCheckpointStore.js";
 export { LocalSyncStore } from "./LocalSyncStore.js";
+export { createLocalProvider } from "./createLocalProvider.js";

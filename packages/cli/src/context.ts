@@ -8,14 +8,8 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import {
-  ConnectorRegistry,
-  DecisionGraphEngine,
-  type Workspace,
-  type WorkspaceProvider,
-} from "@dg/core";
-import { LocalWorkspaceProvider } from "@dg/workspace-local";
-import { GitHubConnector } from "@dg/connectors";
+import { DecisionGraphEngine, type Workspace, type WorkspaceProvider } from "@dg/core";
+import { createLocalProvider } from "@dg/workspace-local";
 import { defaultIO, styler, type IO, type Styler } from "./io.js";
 import { parseArgs, flag, bool, type ParsedArgs } from "./args.js";
 import { UsageError } from "./errors.js";
@@ -43,8 +37,7 @@ export interface BuildOptions {
 }
 
 export function defaultProvider(dataDir: string): WorkspaceProvider {
-  const registry = new ConnectorRegistry().register(new GitHubConnector());
-  return new LocalWorkspaceProvider({ dataDir, registry });
+  return createLocalProvider(dataDir);
 }
 
 function readRef(dataDir: string): string | undefined {

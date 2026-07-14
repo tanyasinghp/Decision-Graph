@@ -1,0 +1,15 @@
+{
+  "name": "@dg/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Decision Graph MCP server — a presentation layer over DecisionGraphEngine, peer to the CLI. Depends only on @dg/core + the composition-root wiring (@dg/workspace-local, @dg/connectors). Phase 3.1 foundation: bootstrap + placeholder tool/resource registration.",
+  "bin": { "dg-mcp": "./bin/dg-mcp.ts" },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*.js": "./src/*.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

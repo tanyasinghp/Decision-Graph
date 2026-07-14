@@ -25,6 +25,8 @@ export default defineConfig({
       { find: "@dg/connectors", replacement: `${root}packages/connectors/src/index.ts` },
       { find: "@dg/workspace-local", replacement: `${root}packages/workspace-local/src/index.ts` },
       { find: "@dg/cli", replacement: `${root}packages/cli/src/index.ts` },
+      { find: /^@dg\/mcp\/(.*)\.js$/, replacement: `${root}packages/mcp/src/$1.ts` },
+      { find: "@dg/mcp", replacement: `${root}packages/mcp/src/index.ts` },
     ],
   },
   test: {

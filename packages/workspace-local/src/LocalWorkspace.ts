@@ -8,6 +8,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { AnthropicClient } from "@dg/engine/llm/AnthropicClient.js";
+import { OllamaClient } from "@dg/engine/llm/OllamaClient.js";
 import type { LlmClient } from "@dg/engine/llm/LlmClient.js";
 import { ConfigError } from "@dg/domain/errors.js";
 import type { SourceSystem } from "@dg/domain/graph.js";
@@ -45,6 +46,13 @@ export class LocalWorkspace implements Workspace {
   }
 
   llm(model?: string): LlmClient {
+    const provider = process.env.LLM_PROVIDER ?? "anthropic";
+    if (provider === "ollama") {
+      const baseUrl = process.env.OLLAMA_BASE_URL ?? "http://localhost:11434";
+      const ollamaModel = process.env.OLLAMA_MODEL ?? model ?? this.config.model;
+      return new OllamaClient(baseUrl, ollamaModel);
+    }
+    if (provider !== "anthropic") throw new ConfigError(`Unknown LLM_PROVIDER "${provider}" — use "anthropic" or "ollama"`);
     const key = process.env.ANTHROPIC_API_KEY;
     if (!key) throw new ConfigError("Missing env var ANTHROPIC_API_KEY (see .env.example)");
     return new AnthropicClient(key, model ?? this.config.model);

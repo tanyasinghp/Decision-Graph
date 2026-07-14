@@ -7,16 +7,15 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "dg": "tsx packages/cli/bin/dg.ts",
+    "dg-mcp": "tsx packages/mcp/bin/dg-mcp.ts",
     "prefetch": "tsx scripts/prefetch.ts",
     "ground-truth": "tsx scripts/fetch-ground-truth.ts",
     "extract": "tsx scripts/extract.ts",
     "replay": "tsx scripts/replay.ts",
-    "link": "tsx scripts/link.ts",
     "evaluate": "tsx scripts/evaluate.ts",
     "build-graph": "tsx scripts/build-graph.ts",
     "export-graph": "tsx scripts/export-graph.ts",
     "ask": "tsx scripts/ask.ts",
-    "stats": "tsx scripts/stats.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
