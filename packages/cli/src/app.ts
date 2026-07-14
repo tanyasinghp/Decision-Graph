@@ -14,31 +14,45 @@ const USAGE = `dg — Decision Graph CLI (v${CLI_VERSION})
 
 Usage: dg <command> [options]
 
+Quick start:
+  1. cp .env.example .env          set ANTHROPIC_API_KEY + GITHUB_TOKEN
+  2. npm run dg -- doctor          verify setup
+  3. npm run dg -- init --repo o/n initialize workspace
+  4. npm run dg -- connect github  connect GitHub (PAT)
+  5. npm run dg -- analyze --component Name  full pipeline
+  6. npm run dg -- ask "..."       ask the graph a question
+
 Setup
-  init            Initialize a local workspace (.decisiongraph/)
-  connect github  Configure the GitHub connector (PAT)
-  workspace       list | show | switch | current
+  init --repo <o/n>  Initialize a local workspace (.decisiongraph/)
+  connect github     Configure the GitHub connector (PAT)
+  workspace          list | show | switch | current
 
 Pipeline
-  ingest [source] Synchronize a connector into the workspace
-  extract         Extract decisions   (--component <Name>)
-  graph           Build/rebuild the Decision Graph   (--no-link)
-  analyze         ingest → extract → graph → link, then a summary
+  ingest [source]    Synchronize a connector into workspace
+  extract           Extract decisions (--component <Name>)
+  graph              Build/rebuild the Decision Graph (--no-link)
+  analyze           ingest → extract → graph → link (--component <Name>)
 
 Reasoning
-  ask [question]  Ask the Decision Graph (interactive if omitted)
-  replay --run    Replay a recorded run
-  export          Export graph: --format json|graphml|mermaid [--out file]
+  ask [question]     Ask the Decision Graph (interactive if omitted)
+  replay --run <id>  Replay a recorded run
+  export [format]    Export graph: json|graphml|mermaid [--out file]
 
 Diagnostics
-  doctor          Workspace / connector / cache / engine health
+  doctor             Workspace / connector / cache / engine health
 
 Global options
-  --repo <o/n>    Target repository / workspace
-  --json          Machine-readable output (progress → stderr)
-  --no-color      Disable ANSI color
-  --resume        Resume a cancelled run (with --run <id>)
-  --help, --version`;
+  --repo <o/n>       Target repository / workspace
+  --json             Machine-readable output (progress → stderr)
+  --no-color         Disable ANSI color
+  --resume [--run]   Resume a cancelled run
+  --help, --version
+
+Environment:
+  ANTHROPIC_API_KEY  Required  Anthropic API key
+  GITHUB_TOKEN       Required  GitHub PAT (public_repo scope)
+  DG_MODEL           Optional  Model override (default: claude-sonnet-4-5)
+  DG_TOOL_BUDGET     Optional  Max tool calls (default: 25)`;
 
 function printHelp(io: IO): void {
   io.stdout(USAGE + "\n");
