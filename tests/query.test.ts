@@ -188,8 +188,7 @@ describe("QueryEngine end-to-end (scripted model)", () => {
     expect(res.context.text).toContain("Evolution (oldest → newest)");
     expect(res.context.text).toContain("status=superseded");
     // The reasoning prompt (system) instructs: newest decision is current.
-    const answerer = engine as unknown as { llm: ScriptedAnswerer };
-    void answerer;
+    
   });
 
   it("comparison question gets the comparison plan and larger budget", () => {

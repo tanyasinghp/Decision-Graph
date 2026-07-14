@@ -336,7 +336,7 @@ function captureIO(env?: Record<string, string | undefined>): IO & { out(): stri
   let out = "";
   return {
     stdout: (s: string) => { out += s; },
-    stderr: () => {},
+    stderr: (_s: string) => {},
     isTTY: false,
     color: false,
     cwd: process.cwd(),

@@ -322,7 +322,7 @@ export const exportCmd: Command = async (ctx) => {
     return 0;
   }
   if (out) {
-    fs.writeFileSync(out, r.output.content, "utf8");
+    await fs.promises.writeFile(out, r.output.content, "utf8");
     ok(ctx.io, ctx.s, `Wrote ${out} (${format})`);
   } else {
     ctx.io.stdout(r.output.content + (r.output.content.endsWith("\n") ? "" : "\n"));

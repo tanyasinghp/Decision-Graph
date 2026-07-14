@@ -163,7 +163,6 @@ describe("GitHubConnector", () => {
     expect(Object.keys(cache.readIssues())).toHaveLength(2); // no duplicates
     expect(Object.keys(cache.readPrs())).toHaveLength(1);
     expect(Object.keys(cache.readCommits())).toHaveLength(2);
-    void store; // (helper referenced to keep signature explicit)
   });
 });
 
