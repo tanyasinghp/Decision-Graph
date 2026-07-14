@@ -200,7 +200,7 @@ DG_DATA_DIR=./.decisiongraph           # Default workspace directory
 
 MIT
 
----
+<!-- ---
 
 ### 🚧 Items Flagged for Future Work
 
@@ -213,4 +213,4 @@ MIT
 | VS Code extension | 📋 Planned |
 | Frontend test coverage | 📋 Planned |
 | Pre-built binary (no tsx) | 📋 Planned |
-| Async I/O migration | 📋 Known debt |
+| Async I/O migration | 📋 Known debt | -->
