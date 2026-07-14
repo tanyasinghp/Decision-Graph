@@ -26,11 +26,11 @@ import * as crypto from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { GraphIntegrityError } from "@dg/domain/errors.js";
+import type { EdgeType } from "@dg/domain/graph.js";
 import {
   EDGE_RULES,
   GraphFileSchema,
   edgeId,
-  type EdgeType,
   type GraphEdge,
   type GraphFile,
   type GraphNode,
@@ -75,7 +75,8 @@ export class JsonGraphStore implements GraphStore {
   // Adjacency indexes, rebuilt on load, maintained on write. Traversal is
   // O(degree) per hop instead of O(E) scans.
   private out = new Map<string, GraphEdge[]>();
-  private in_ = new Map<string, GraphEdge[]>();
+  private inbound = new Map<string, GraphEdge[]>();
+  private dirty = false;
 
   constructor(
     dataDir: string,
@@ -87,12 +88,13 @@ export class JsonGraphStore implements GraphStore {
     this.graph = fs.existsSync(this.file)
       ? GraphFileSchema.parse(JSON.parse(fs.readFileSync(this.file, "utf8")))
       : { schemaVersion: 2, repo, nodes: {}, edges: {} };
+    this.dirty = true;
     for (const e of Object.values(this.graph.edges)) this.index(e);
   }
 
   private index(e: GraphEdge): void {
     (this.out.get(e.from) ?? this.out.set(e.from, []).get(e.from)!).push(e);
-    (this.in_.get(e.to) ?? this.in_.set(e.to, []).get(e.to)!).push(e);
+    (this.inbound.get(e.to) ?? this.inbound.set(e.to, []).get(e.to)!).push(e);
   }
 
   upsertNode(input: NodeInput): GraphNode {
@@ -138,6 +140,7 @@ export class JsonGraphStore implements GraphStore {
     const edge: GraphEdge = { ...input, id, createdAt: this.clock() };
     this.graph.edges[id] = edge;
     this.index(edge);
+    this.dirty = true;
     return edge;
   }
 
@@ -168,7 +171,7 @@ export class JsonGraphStore implements GraphStore {
   edges(filter?: { type?: EdgeType; from?: string; to?: string }): GraphEdge[] {
     let list: GraphEdge[];
     if (filter?.from) list = this.out.get(filter.from) ?? [];
-    else if (filter?.to) list = this.in_.get(filter.to) ?? [];
+    else if (filter?.to) list = this.inbound.get(filter.to) ?? [];
     else list = Object.values(this.graph.edges);
     return list
       .filter((e) => (!filter?.type || e.type === filter.type) && (!filter?.from || e.from === filter.from) && (!filter?.to || e.to === filter.to))
@@ -176,10 +179,12 @@ export class JsonGraphStore implements GraphStore {
   }
 
   flush(): void {
+    if (!this.dirty) return;
     fs.mkdirSync(path.dirname(this.file), { recursive: true });
     const tmp = `${this.file}.tmp`;
     fs.writeFileSync(tmp, JSON.stringify(sortKeysDeep(this.graph), null, 2) + "\n", "utf8");
     fs.renameSync(tmp, this.file);
+    this.dirty = false;
   }
 
   /** Historical snapshots of a node, oldest first (for historical traversal). */

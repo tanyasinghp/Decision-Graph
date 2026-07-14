@@ -46,7 +46,9 @@ export class RunLog {
       .readFileSync(file, "utf8")
       .split("\n")
       .filter((l) => l.trim().length > 0)
-      .map((l) => RunEventSchema.parse(JSON.parse(l)));
+      .flatMap((l) => {
+        try { return [RunEventSchema.parse(JSON.parse(l))]; } catch { return []; }
+      });
   }
 }
 

@@ -11,18 +11,19 @@ import type { DecisionObject } from "@dg/domain/types.js";
 import type { DecisionStore } from "@dg/core";
 
 const Decisions = z.array(DecisionObjectSchema);
+const safe = (s: string): string => s.replace(/[^a-zA-Z0-9._-]/g, "_");
 
 export class LocalDecisionStore implements DecisionStore {
   constructor(private readonly dir: string) {}
 
   save(component: string, promptVersion: string, decisions: DecisionObject[]): void {
     fs.mkdirSync(this.dir, { recursive: true });
-    const file = path.join(this.dir, `${component.toLowerCase()}.${promptVersion}.json`);
+    const file = path.join(this.dir, `${safe(component.toLowerCase())}.${promptVersion}.json`);
     fs.writeFileSync(file, JSON.stringify(decisions, null, 2) + "\n", "utf8");
   }
 
   loadComponent(component: string, promptVersion: string): DecisionObject[] {
-    const file = path.join(this.dir, `${component.toLowerCase()}.${promptVersion}.json`);
+    const file = path.join(this.dir, `${safe(component.toLowerCase())}.${promptVersion}.json`);
     if (!fs.existsSync(file)) return [];
     return Decisions.parse(JSON.parse(fs.readFileSync(file, "utf8")));
   }

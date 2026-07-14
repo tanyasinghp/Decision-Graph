@@ -5,6 +5,7 @@
  * composition root.
  */
 
+import { ConfigError } from "@dg/domain/errors.js";
 import type { SourceSystem } from "@dg/domain/graph.js";
 import type { Connector } from "./types.js";
 
@@ -18,7 +19,7 @@ export class ConnectorRegistry {
 
   get(source: SourceSystem): Connector {
     const c = this.map.get(source);
-    if (!c) throw new Error(`No connector registered for source "${source}". Registered: ${this.list().join(", ") || "(none)"}`);
+    if (!c) throw new ConfigError(`No connector registered for source "${source}". Registered: ${this.list().join(", ") || "(none)"}`);
     return c;
   }
 

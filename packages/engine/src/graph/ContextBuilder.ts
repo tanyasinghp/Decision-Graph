@@ -26,7 +26,7 @@
  * in reserve for follow-ups.
  */
 
-import { decisionData, type GraphNode } from "@dg/domain/graph.js";
+import { decisionData, type EdgeType, type GraphNode } from "@dg/domain/graph.js";
 import type { GraphStore } from "./GraphStore.js";
 import { GraphTraversal } from "./traverse.js";
 
@@ -39,7 +39,7 @@ export interface BuiltContext {
 
 /** Expansion strategy — supplied by the QueryPlanner; defaults cover ad-hoc use. */
 export interface ExpansionPlan {
-  tiers: ReadonlyArray<ReadonlyArray<string>>;
+  tiers: ReadonlyArray<ReadonlyArray<EdgeType>>;
   nodeBudget: number;
 }
 
@@ -64,7 +64,7 @@ export class ContextBuilder {
   }
 
   build(question: string, plan?: Partial<ExpansionPlan>): BuiltContext {
-    const tiers = plan?.tiers ?? DEFAULT_PLAN.tiers;
+    const tiers = (plan?.tiers ?? DEFAULT_PLAN.tiers) as ReadonlyArray<ReadonlyArray<string>>;
     const nodeBudget = plan?.nodeBudget ?? this.defaultBudget;
     const terms = new Set(tokenize(question));
 

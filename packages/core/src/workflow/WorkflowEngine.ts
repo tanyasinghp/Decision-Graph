@@ -82,9 +82,10 @@ export class WorkflowEngine {
 
     // Cancellation: our own controller, optionally chained to a caller signal.
     const controller = new AbortController();
+    const onAbort = () => controller.abort();
     if (opts.signal) {
       if (opts.signal.aborted) controller.abort();
-      else opts.signal.addEventListener("abort", () => controller.abort(), { once: true });
+      else opts.signal.addEventListener("abort", onAbort, { once: true });
     }
     const signal = controller.signal;
 
@@ -169,6 +170,10 @@ export class WorkflowEngine {
         bus.lifecycle({ kind: "run_failed", message });
         bus.lifecycle({ kind: "run_finished", status: "failed", ms: Date.now() - start });
         return { runId, status: "failed", error: { message }, events: bus.lastSeq + 1 };
+      } finally {
+        if (opts.signal && !opts.signal.aborted) {
+          opts.signal.removeEventListener("abort", onAbort);
+        }
       }
     })();
 

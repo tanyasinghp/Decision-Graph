@@ -48,7 +48,7 @@ export class EventBus {
       payload,
     };
     this.last = e.seq;
-    for (const sink of this.sinks) sink(e);
+    for (const sink of this.sinks) { try { sink(e); } catch { /* isolate sink failures */ } }
     return e;
   }
 

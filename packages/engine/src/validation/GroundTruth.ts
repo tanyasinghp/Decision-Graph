@@ -56,6 +56,7 @@ export class GroundTruth {
 
   /** Units for one component: files whose path contains /<Component>/ (case-insensitive). */
   forComponent(component: string): GroundTruthUnit[] {
+    if (!component || component.trim().length === 0) return [];
     const needle = `/${component.toLowerCase()}/`;
     return walk(this.repoDir)
       .filter((f) => f.toLowerCase().includes(needle))

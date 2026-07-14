@@ -9,6 +9,7 @@
 import * as crypto from "node:crypto";
 
 function normalize(value: unknown): unknown {
+  if (value === undefined) return null;
   if (Array.isArray(value)) return value.map(normalize);
   if (value && typeof value === "object") {
     const src = value as Record<string, unknown>;
@@ -20,7 +21,7 @@ function normalize(value: unknown): unknown {
 }
 
 export function stableStringify(value: unknown): string {
-  return JSON.stringify(normalize(value)) ?? "null";
+  return JSON.stringify(normalize(value));
 }
 
 export function sha256(s: string): string {

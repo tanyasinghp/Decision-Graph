@@ -4,6 +4,7 @@
  * one with the built-in workflows.
  */
 
+import { ConfigError } from "@dg/domain/errors.js";
 import type { Workflow } from "./Workflow.js";
 
 export class WorkflowCatalog {
@@ -16,7 +17,7 @@ export class WorkflowCatalog {
 
   get(name: string): Workflow<unknown, unknown> {
     const wf = this.map.get(name);
-    if (!wf) throw new Error(`Unknown workflow: "${name}". Known: ${this.list().join(", ") || "(none)"}`);
+    if (!wf) throw new ConfigError(`Unknown workflow: "${name}". Known: ${this.list().join(", ") || "(none)"}`);
     return wf;
   }
 

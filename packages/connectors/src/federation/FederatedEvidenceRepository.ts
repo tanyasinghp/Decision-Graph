@@ -78,12 +78,7 @@ export class FederatedEvidenceRepository implements EvidenceRepository {
 
   async getFile(path: string): Promise<FileContent> {
     // ForbiddenPathError must surface (guard), so firstHit only swallows misses.
-    try {
-      return await this.firstHit((r) => r.getFile(path), `file ${path}`);
-    } catch (e) {
-      if (e instanceof ForbiddenPathError) throw e;
-      throw e;
-    }
+    return this.firstHit((r) => r.getFile(path), `file ${path}`);
   }
 
   async listDirectory(path: string): Promise<DirEntry[]> {

@@ -15,6 +15,8 @@ export interface RunStore {
   readEvents(runId: string): WorkflowEvent[];
   putCheckpoint(c: Checkpoint): void;
   getCheckpoint(runId: string): Checkpoint | undefined;
+  /** All recorded run checkpoints (read-only; one per run). */
+  list(): Checkpoint[];
   /** Persist a step's output; returns a ref used later to skip on resume. */
   putStepOutput(runId: string, stepId: string, output: unknown): string;
   getStepOutput(runId: string, ref: string): unknown;
@@ -24,6 +26,11 @@ export class InMemoryRunStore implements RunStore {
   private readonly events = new Map<string, WorkflowEvent[]>();
   private readonly checkpoints = new Map<string, Checkpoint>();
   private readonly outputs = new Map<string, unknown>();
+
+  clearRun(runId: string): void {
+    this.events.delete(runId);
+    this.checkpoints.delete(runId);
+  }
 
   appendEvent(e: WorkflowEvent): void {
     const list = this.events.get(e.runId) ?? [];
@@ -42,6 +49,10 @@ export class InMemoryRunStore implements RunStore {
 
   getCheckpoint(runId: string): Checkpoint | undefined {
     return this.checkpoints.get(runId);
+  }
+
+  list(): Checkpoint[] {
+    return [...this.checkpoints.values()];
   }
 
   putStepOutput(runId: string, stepId: string, output: unknown): string {

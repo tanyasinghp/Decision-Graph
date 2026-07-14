@@ -40,7 +40,9 @@ export class LocalRunStore implements RunStore {
       .readFileSync(f, "utf8")
       .split("\n")
       .filter((l) => l.trim().length > 0)
-      .map((l) => JSON.parse(l) as WorkflowEvent);
+      .flatMap((l) => {
+        try { return [JSON.parse(l) as WorkflowEvent]; } catch { return []; }
+      });
   }
 
   putCheckpoint(c: Checkpoint): void {
@@ -48,6 +50,9 @@ export class LocalRunStore implements RunStore {
   }
   getCheckpoint(runId: string): Checkpoint | undefined {
     return this.checkpoints.getCheckpoint(runId);
+  }
+  list(): Checkpoint[] {
+    return this.checkpoints.list();
   }
   putStepOutput(runId: string, stepId: string, output: unknown): string {
     return this.checkpoints.putStepOutput(runId, stepId, output);

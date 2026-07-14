@@ -26,12 +26,36 @@ export class LocalCheckpointStore {
 
   putCheckpoint(c: Checkpoint): void {
     fs.mkdirSync(this.dir, { recursive: true });
-    fs.writeFileSync(this.ckptFile(c.runId), JSON.stringify(c, null, 2) + "\n", "utf8");
+    const f = this.ckptFile(c.runId);
+    const tmp = f + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(c, null, 2) + "\n", "utf8");
+    fs.renameSync(tmp, f);
   }
 
   getCheckpoint(runId: string): Checkpoint | undefined {
     const f = this.ckptFile(runId);
-    return fs.existsSync(f) ? (JSON.parse(fs.readFileSync(f, "utf8")) as Checkpoint) : undefined;
+    if (!fs.existsSync(f)) return undefined;
+    try {
+      const raw = JSON.parse(fs.readFileSync(f, "utf8")) as Checkpoint;
+      if (typeof raw.runId !== "string" || typeof raw.status !== "string") return undefined;
+      return raw;
+    } catch {
+      return undefined;
+    }
+  }
+
+  list(): Checkpoint[] {
+    if (!fs.existsSync(this.dir)) return [];
+    const out: Checkpoint[] = [];
+    for (const f of fs.readdirSync(this.dir)) {
+      if (!f.endsWith(".checkpoint.json")) continue;
+      try {
+        out.push(JSON.parse(fs.readFileSync(path.join(this.dir, f), "utf8")) as Checkpoint);
+      } catch {
+        // skip an unreadable checkpoint rather than fail the whole listing
+      }
+    }
+    return out;
   }
 
   putStepOutput(runId: string, stepId: string, output: unknown): string {

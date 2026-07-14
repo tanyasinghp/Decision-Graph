@@ -79,6 +79,7 @@ export class AgentLoop {
       turns++;
       inputTokens += resp.usage.inputTokens;
       outputTokens += resp.usage.outputTokens;
+      if (signal?.aborted) return { status: "cancelled", toolCalls, turns, inputTokens, outputTokens };
 
       // Surface the model's visible reasoning — nothing hidden.
       for (const b of resp.blocks) {
@@ -97,7 +98,6 @@ export class AgentLoop {
       const results: LlmToolResultBlock[] = [];
 
       for (const tu of toolUses) {
-        if (tu.type !== "tool_use") continue;
         const exempt = config.budgetExemptTools.includes(tu.name);
         const budgetLeft = toolCalls < config.toolBudget;
 
